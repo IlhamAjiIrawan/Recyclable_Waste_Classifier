@@ -2,7 +2,7 @@ import os
 import cvzone
 from cvzone.ClassificationModule import Classifier
 import cv2
-import time  # Tambahkan import time
+import time
 
 # Start the video capture
 cap = cv2.VideoCapture(0)
@@ -62,7 +62,10 @@ while True:
         break
 
     prediction = classifier.getPrediction(img)
-    classID = prediction[1]
+    classPredictions, classID = prediction
+
+    # Dapatkan akurasi prediksi (nilai maksimum dari prediksi class)
+    accuracy = max(classPredictions) * 100  # dalam persen
 
     if classID != 0:
         if classID - 1 < len(imgWasteList):
@@ -81,9 +84,13 @@ while True:
     # Tampilkan FPS di layar
     cvzone.putTextRect(imgBackground, f'FPS: {int(fps)}', (50, 50), scale=2, thickness=2, colorT=(255,255,255), colorR=(0,0,0), offset=10)
 
+    # Tampilkan Akurasi di layar
+    cvzone.putTextRect(imgBackground, f'Accuracy: {accuracy:.2f} %', (50, 100), scale=2, thickness=2, colorT=(255,255,255), colorR=(0,0,0), offset=10)
+
     # Tampilkan jendela hasil
     cv2.imshow("Output", imgBackground)
-    cv2.waitKey(1)
+    if cv2.waitKey(1) & 0xFF == ord('q'):
+        break
 
 print("Closing the video capture.")
 cap.release()
